@@ -70,58 +70,6 @@
         </div>
     </header>
 
-    <div id="rekomendasi" class="text-center bg-dark text-light has-height-md middle-items wow fadeIn">
-        <h2 class="section-title">Rekomendasi Untukmu</h2>
-    </div>
-
-    @if($produkRekomendasi->isEmpty())
-        <p class="text-center text-light">Belum ada rekomendasi produk untukmu saat ini.</p>
-    @else
-        <div class="gallary row">
-            @foreach($produkRekomendasi as $item)
-                <div class="col-sm-6 col-lg-3 gallary-item wow fadeIn">
-                    <img src="{{ asset('storage/' . $item->foto) }}" class="gallary-img" alt="{{ $item->name }}">
-                    <a href="#" class="gallary-overlay" data-toggle="modal" data-target="#productRecommendationModal"
-                        data-id="{{ $item->id }}"
-                        data-category="{{ $item->category_id }}"
-                        data-name="{{ $item->name }}"
-                        data-description="{{ $item->description }}"
-                        data-price="{{ number_format($item->price, 0, ',', '.') }}"
-                        data-image="{{ asset('storage/' . $item->foto) }}">
-                        <i class="gallary-icon ti-plus"></i>
-                    </a>
-                    <div class="gallary-info">
-                        <h5>{{ $item->name }}</h5>
-                        {{-- <p>{{ $item->category_id }}</p> --}}
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    @endif
-
-    <!-- Modal Produk Rekomendasi -->
-    <div class="modal fade" id="productRecommendationModal" tabindex="-1" role="dialog" aria-labelledby="productRecommendationModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="productRecommendationModalLabel">Detail Produk Rekomendasi</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <img id="modalProductImageRecommendation" src="" class="mb-3 img-fluid" alt="Recommendation Product Image">
-                    <h4 class="text-dark" id="modalProductNameRecommendation"></h4>
-                    <p class="text-dark" id="modalProductDescriptionRecommendation"></p>
-                    <h5 class="text-dark" id="modalProductPriceRecommendation"></h5>
-                    <input type="hidden" id="modalProductIdRecommendation" value="">
-                    <input type="hidden" id="modalCategoryIdRecommendation" value="">
-                    <button id="addToCartButtonRecommendation" class="btn btn-primary btn-block">Tambah ke Keranjang</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
 
     <!-- Menu Section -->

@@ -42,16 +42,16 @@ class CustomerAuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:customers,email',
-            'phone' => 'nullable|string|max:15',
-            'address' => 'nullable|string|max:500',
+            // 'phone' => 'nullable|string|max:15',
+            // 'address' => 'nullable|string|max:500',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
         Customer::create([
             'name' => $request->name,
             'email' => $request->email,
-            'phone' => $request->phone,
-            'address' => $request->address,
+            // 'phone' => $request->phone,
+            // 'address' => $request->address,
             'password' => Hash::make($request->password),
         ]);
 

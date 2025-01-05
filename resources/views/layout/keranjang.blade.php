@@ -116,28 +116,245 @@
             </div>
         </div>
     </div>
-    <!-- page footer  -->
-    <div class="text-center container-fluid bg-dark text-light has-height-md middle-items border-top wow fadeIn">
-        <div class="row">
-            <div class="col-sm-4">
-                <h3>EMAIL US</h3>
-                <P class="text-muted"></P>
+<!-- page footer -->
+<div class="text-center container-fluid bg-dark text-light has-height-md middle-items border-top wow fadeIn">
+    <div class="row">
+
+
+        @if(empty($fpgrowthData['transformed_data']) || empty($fpgrowthData['transformed_data'][1]))
+            <p class="text-center text-light">Belum ada rekomendasi produk untukmu saat ini.</p>
+        @else
+            <div class="gallery row">
+                @foreach($fpgrowthData['transformed_data'][1] as $categoryId)
+                    @php
+                        $products = \App\Models\Product::where('id', $categoryId)->get();
+                    @endphp
+
+                    @foreach($products as $product)
+                        <div class="col-sm-6 col-md-4 col-lg-3 gallery-item">
+                            <div class="gallery-card">
+                                <img src="{{ asset('storage/' . $product->foto) }}" class="rounded gallery-img" alt="{{ $product->name }}">
+
+                                <a class="gallery-overlay"
+                                  data-toggle="modal"
+                                  data-target="#productDetailModal"
+                                   data-id="{{ $product->id }}"
+                                   data-category="{{ $product->category_id }}"
+                                   data-name="{{ $product->name }}"
+                                   data-description="{{ $product->description }}"
+                                   data-price="{{ number_format($product->price, 0, ',', '.') }}"
+                                   data-image="{{ asset('storage/' . $product->foto) }}">
+                                    <i class="gallery-icon ti-plus"></i>
+                                </a>
+
+                                <div class="gallery-info">
+                                    <h5>{{ $product->name }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @endforeach
             </div>
-            <div class="col-sm-4">
-                <h3>CALL US</h3>
-                <P class="text-muted"></P>
+        @endif
+    </div>
+</div>
+
+<!-- Modal untuk Detail Produk -->
+<div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productDetailModalLabel">Detail Produk</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="col-sm-4">
-                <h3>FIND US</h3>
-                <P class="text-muted"></P>
+            <div class="modal-body">
+                <img src="" class="img-fluid" alt="">
+                <input type="hidden" id="modalProductIdDetail">
+                <input type="hidden" id="modalCategoryIdDetail">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" id="addToCartButtonDetail" class="btn btn-primary">Tambah ke Keranjang</button>
             </div>
         </div>
     </div>
-    <div class="text-center bg-dark text-light border-top wow fadeIn">
-        <p class="py-3 mb-0 text-muted small">&copy; Copyright <script>.write(new Date().getFullYear())</script> Brotherhood <i class="ti-heart text-danger"></i></p>
-    </div>
+</div>
 
-    <!-- end of page footer -->
+<!-- Modal untuk Rekomendasi Produk -->
+<div class="modal fade" id="productRecommendationModal" tabindex="-1" aria-labelledby="productRecommendationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productRecommendationModalLabel">Detail Produk</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <img src="" class="img-fluid" alt="">
+                <h4></h4>
+                <p></p>
+                <h5></h5>
+                <input type="hidden" id="modalProductIdRecommendation">
+                <input type="hidden" id="modalCategoryIdRecommendation">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" id="addToCartButtonRecommendation" class="btn btn-primary">Tambah ke Keranjang</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="text-center bg-dark text-light border-top wow fadeIn">
+    <p class="py-3 mb-0 text-muted small">&copy; Copyright <script>.write(new Date().getFullYear())</script> Brotherhood <i class="ti-heart text-danger"></i></p>
+</div>
+
+<style>
+    /* Gallery styling */
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.gallery-item {
+    flex: 1 1 22%; /* Ukuran dasar item gallery */
+    max-width: 22%; /* Maksimum lebar item gallery */
+    box-sizing: border-box;
+    margin-bottom: 20px; /* Ruang di bawah setiap gambar */
+    transition: transform 0.3s ease-in-out;
+}
+
+.gallery-item:hover {
+    transform: scale(1.05); /* Zoom efek saat hover */
+}
+
+.gallery-card {
+    position: relative;
+    overflow: hidden;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.gallery-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.gallery-card:hover .gallery-img {
+    transform: scale(1.05); /* Zoom efek gambar saat hover */
+}
+
+.gallery-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+    border-radius: 50%;
+    display: none;
+}
+
+.gallery-item:hover .gallery-overlay {
+    display: block; /* Menampilkan overlay saat hover */
+}
+
+.gallery-info {
+    padding: 15px;
+    text-align: center;
+}
+
+.gallery-info h5 {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+}
+
+</style>
+<script>
+    $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    // Reset modal function
+    function resetModal(modal) {
+        modal.find('input[type="hidden"]').val('');
+        modal.find('.modal-body img').attr('src', '');
+        modal.find('.modal-body h4').text('');
+        modal.find('.modal-body p').text('');
+        modal.find('.modal-body h5').text('');
+    }
+
+    // When product detail modal or recommendation modal is shown
+    $('#productDetailModal, #productRecommendationModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var modal = $(this);
+
+        // Get data attributes from the clicked button
+        var productId = button.data('id');
+        var categoryId = button.data('category');
+        var productName = button.data('name');
+        var productDescription = button.data('description');
+        var productPrice = button.data('price');
+        var productImage = button.data('image');
+
+        resetModal(modal);
+
+        // Set modal content
+        modal.find('#modalProductIdDetail, #modalProductIdRecommendation').val(productId);
+        modal.find('#modalCategoryIdDetail, #modalCategoryIdRecommendation').val(categoryId);
+        modal.find('.modal-body img').attr('src', productImage);
+        modal.find('.modal-body h4').text(productName);
+        modal.find('.modal-body p').text(productDescription);
+        modal.find('.modal-body h5').text('Rp ' + productPrice);
+    });
+
+    // Add to cart button click handler
+    $('#addToCartButtonDetail, #addToCartButtonRecommendation').click(function () {
+        var buttonId = $(this).attr('id');
+        var productId = buttonId === 'addToCartButtonDetail'
+            ? $('#modalProductIdDetail').val()
+            : $('#modalProductIdRecommendation').val();
+        var categoryId = buttonId === 'addToCartButtonDetail'
+            ? $('#modalCategoryIdDetail').val()
+            : $('#modalCategoryIdRecommendation').val();
+        var customerId = {{ Auth::guard('customer')->user()->id }}; // Customer ID
+
+        // Ajax request to add product to cart
+        $.ajax({
+            url: '/customer/dashboard/add-to-cart',
+            method: 'POST',
+            data: {
+                customer_id: customerId,
+                category_id: categoryId,
+                produk_id: productId
+            },
+            success: function (response) {
+                alert(response.success || 'Produk berhasil ditambahkan ke keranjang!');
+                $('.modal').modal('hide'); // Close modal on success
+            },
+            error: function (xhr) {
+                var errorMsg = xhr.responseJSON?.error || 'Terjadi kesalahan saat menambahkan produk ke keranjang.';
+                alert(errorMsg);
+            }
+        });
+    });
+});
+
+</script>
+<!-- end of page footer -->
+
+
     <script src="{{ asset('dist') }}/assets/vendors/jquery/jquery-3.4.1.js"></script>
     <script src="{{ asset('dist') }}/assets/vendors/bootstrap/bootstrap.bundle.js"></script>
 

@@ -35,7 +35,7 @@
                     <label for="email" class="form-label">Email</label>
                     <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}" placeholder="Enter your email" required>
                 </div>
-
+{{--
                 <div class="mb-3">
                     <label for="phone" class="form-label">Phone</label>
                     <input type="text" name="phone" id="phone" class="form-control" value="{{ old('phone') }}" placeholder="Enter your phone number">
@@ -44,7 +44,7 @@
                 <div class="mb-3">
                     <label for="address" class="form-label">Address</label>
                     <textarea name="address" id="address" class="form-control" placeholder="Enter your address">{{ old('address') }}</textarea>
-                </div>
+                </div> --}}
 
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>

@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="{{ asset('dist') }}/assets/vendors/themify-icons/css/themify-icons.css">
     <link rel="stylesheet" href="{{ asset('dist') }}/assets/vendors/animate/animate.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
     <!-- Bootstrap + FoodHut main styles -->
 	<link rel="stylesheet" href="{{ asset('dist') }}/assets/css/foodhut.css">
 </head>
@@ -64,33 +63,46 @@
             <a class="btn btn-lg btn-primary" href="#menu">Menu</a>
         </div>
     </header>
-    <div id="rekomendasi" class="text-center bg-dark text-light has-height-md middle-items wow fadeIn">
+    {{-- <div id="rekomendasi" class="text-center bg-dark text-light has-height-md middle-items wow fadeIn">
         <h2 class="section-title">Rekomendasi Untukmu</h2>
     </div>
-
-    @if($produkRekomendasi->isEmpty())
-        <p class="text-center text-light">Belum ada rekomendasi produk untukmu saat ini.</p>
+    @if(empty($fpgrowthData['transformed_data']) || empty($fpgrowthData['transformed_data'][1]))
+    <p class="text-center text-light">Belum ada rekomendasi produk untukmu saat ini.</p>
     @else
-        <div class="gallary row">
-            @foreach($produkRekomendasi as $item)
-                <div class="col-sm-6 col-lg-3 gallary-item wow fadeIn">
-                    <img src="{{ asset('storage/' . $item->foto) }}" class="gallary-img" alt="{{ $item->name }}">
-                    <a href="{{ route('customer.login') }}" class="gallary-overlay"
-                        data-id="{{ $item->id }}"
-                        data-category="{{ $item->category_id }}"
-                        data-name="{{ $item->name }}"
-                        data-description="{{ $item->description }}"
-                        data-price="{{ number_format($item->price, 0, ',', '.') }}"
-                        data-image="{{ asset('storage/' . $item->foto) }}">
-                        <i class="gallary-icon ti-plus"></i>
-                    </a>
-                    <div class="gallary-info">
-                        <h5>{{ $item->name }}</h5>
+        <div class="gallery row">
+            @foreach($fpgrowthData['transformed_data'][1] as $categoryId) <!-- Use transformed_data[1] -->
+                @php
+                    $products = \App\Models\Product::where('id', $categoryId)->get();
+                @endphp
+
+                @foreach($products as $product)
+                    <div class="col-sm-6 col-lg-3 gallery-item wow fadeIn">
+                        @if(file_exists(public_path('storage/' . $product->foto)))
+                            <img src="{{ asset('storage/' . $product->foto) }}" class="gallery-img" alt="{{ $product->name }}">
+                        @else
+                            <img src="{{ asset('storage/default-image.jpg') }}" class="gallery-img" alt="{{ $product->name }}">
+                        @endif
+
+                        <a href="#" class="gallery-overlay"
+                            data-id="{{ $product->id }}"
+                            data-category="{{ $product->category_id }}"
+                            data-name="{{ $product->name }}"
+                            data-description="{{ $product->description }}"
+                            data-price="{{ number_format($product->price, 0, ',', '.') }}"
+                            data-image="{{ asset('storage/' . $product->foto) }}">
+                            <i class="gallery-icon ti-plus"></i>
+                        </a>
+
+                        <div class="gallery-info">
+                            <h5>{{ $product->name }}</h5>
+                        </div>
                     </div>
-                </div>
+                @endforeach
             @endforeach
         </div>
-    @endif
+    @endif --}}
+
+
     <!-- menu Section  -->
     <div id="menu" class="py-5 text-center container-fluid bg-dark text-light wow fadeIn">
         <h2 class="py-5 section-title">MENU</h2>
