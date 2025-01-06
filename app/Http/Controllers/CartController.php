@@ -35,6 +35,7 @@ class CartController extends Controller
             $fpgrowthData = json_decode($fpgrowthData->getContent(), true);
             $data['fpgrowthData'] = $fpgrowthData;
         }
+        // dd($fpgrowthData);
         return view('layout.keranjang', $data);
     }
 
@@ -109,6 +110,7 @@ class CartController extends Controller
                 }
             }
         }
+
         $frequentPatterns = [];
         foreach ($itemsets as $itemset) {
             if (!isset($frequentPatterns[$itemset])) {
@@ -116,36 +118,53 @@ class CartController extends Controller
             }
             $frequentPatterns[$itemset]++;
         }
+
+        // Mengurangi support threshold untuk menangani lebih banyak frequent pattern
         foreach ($frequentPatterns as $itemset => $count) {
-            if ($count < $supportThreshold) {
+            if ($count < 2) { // Mengurangi dari 3 menjadi 2, untuk mendapatkan lebih banyak pola
                 unset($frequentPatterns[$itemset]);
             }
         }
+
         return $frequentPatterns;
     }
+
     private function generateAssociationRules($frequentPatterns)
     {
         $associationRules = [];
 
         foreach ($frequentPatterns as $itemset => $support) {
             $items = explode(",", $itemset);
-            $antecedents = $items[0];
-            $consequents = $items[1];
-            $confidence = $this->calculateConfidence($antecedents, $consequents, $support);
-            $lift = $this->calculateLift($antecedents, $consequents, $support);
 
-            if ($confidence >= 0.5) {
-                $associationRules[] = [
-                    'antecedents' => $antecedents,
-                    'consequents' => $consequents,
-                    'confidence' => $confidence,
-                    'lift' => $lift
-                ];
+            // Jika itemset hanya berisi 1 item, lewati
+            if (count($items) < 2) {
+                continue;
+            }
+
+            // Pisahkan itemset menjadi antecedents dan consequents
+            for ($i = 0; $i < count($items); $i++) {
+                $antecedents = $items[$i];
+                $consequents = array_diff($items, [$antecedents]);
+                $consequents = implode(",", $consequents); // Gabungkan menjadi string
+
+                $confidence = $this->calculateConfidence($antecedents, $consequents, $support);
+                $lift = $this->calculateLift($antecedents, $consequents, $support);
+
+                // Menurunkan threshold untuk meningkatkan jumlah asosiasi yang dihasilkan
+                if ($confidence >= 0.5) { // Threshold confidence 0.3
+                    $associationRules[] = [
+                        'antecedents' => $antecedents,
+                        'consequents' => $consequents,
+                        'confidence' => $confidence,
+                        'lift' => $lift
+                    ];
+                }
             }
         }
 
         return $associationRules;
     }
+
     private function calculateConfidence($antecedent, $consequent, $support)
     {
         $antecedentSupport = $this->getSupport($antecedent);

@@ -63,7 +63,7 @@
             <a class="btn btn-lg btn-primary" href="#menu">Menu</a>
         </div>
     </header>
-    {{-- <div id="rekomendasi" class="text-center bg-dark text-light has-height-md middle-items wow fadeIn">
+    <div id="rekomendasi" class="text-center bg-dark text-light has-height-md middle-items wow fadeIn">
         <h2 class="section-title">Rekomendasi Untukmu</h2>
     </div>
     @if(empty($fpgrowthData['transformed_data']) || empty($fpgrowthData['transformed_data'][1]))
@@ -100,7 +100,7 @@
                 @endforeach
             @endforeach
         </div>
-    @endif --}}
+    @endif
 
 
     <!-- menu Section  -->

@@ -119,31 +119,41 @@
 <!-- page footer -->
 <div class="text-center container-fluid bg-dark text-light has-height-md middle-items border-top wow fadeIn">
     <div class="row">
-
-
-        @if(empty($fpgrowthData['transformed_data']) || empty($fpgrowthData['transformed_data'][1]))
+        <div class="mb-3 col-sm-12 col-lg-12 item-center">
+            <h2 class="text-center">
+                Menu Lain yang sering di pesan
+            </h2>
+        </div>
+        @if(empty($fpgrowthData['association_rules']) || count($fpgrowthData['association_rules']) == 0)
             <p class="text-center text-light">Belum ada rekomendasi produk untukmu saat ini.</p>
         @else
             <div class="gallery row">
-                @foreach($fpgrowthData['transformed_data'][1] as $categoryId)
-                    @php
-                        $products = \App\Models\Product::where('id', $categoryId)->get();
-                    @endphp
+                @php
+                    $productIds = [];
+                    foreach ($fpgrowthData['association_rules'] as $rule) {
+                        $consequents = explode(",", $rule['consequents']);
+                        $productIds = array_merge($productIds, $consequents);
+                    }
+                    $productIds = array_unique($productIds);
+                @endphp
 
-                    @foreach($products as $product)
+                @foreach($productIds as $productId)
+                    @php
+                        $product = \App\Models\Product::find($productId);
+                    @endphp
+                    @if($product)
                         <div class="col-sm-6 col-md-4 col-lg-3 gallery-item">
                             <div class="gallery-card">
                                 <img src="{{ asset('storage/' . $product->foto) }}" class="rounded gallery-img" alt="{{ $product->name }}">
-
                                 <a class="gallery-overlay"
                                   data-toggle="modal"
                                   data-target="#productDetailModal"
-                                   data-id="{{ $product->id }}"
-                                   data-category="{{ $product->category_id }}"
-                                   data-name="{{ $product->name }}"
-                                   data-description="{{ $product->description }}"
-                                   data-price="{{ number_format($product->price, 0, ',', '.') }}"
-                                   data-image="{{ asset('storage/' . $product->foto) }}">
+                                  data-id="{{ $product->id }}"
+                                  data-category="{{ $product->category_id }}"
+                                  data-name="{{ $product->name }}"
+                                  data-description="{{ $product->description }}"
+                                  data-price="{{ number_format($product->price, 0, ',', '.') }}"
+                                  data-image="{{ asset('storage/' . $product->foto) }}">
                                     <i class="gallery-icon ti-plus"></i>
                                 </a>
 
@@ -152,53 +162,31 @@
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+                    @endif
                 @endforeach
             </div>
         @endif
     </div>
 </div>
 
+
 <!-- Modal untuk Detail Produk -->
 <div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="productDetailModalLabel">Detail Produk</h5>
+                <h5 class="modal-title text-dark" id="productDetailModalLabel">Detail Produk</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <img src="" class="img-fluid" alt="">
+                <h4 id></h4>
                 <input type="hidden" id="modalProductIdDetail">
                 <input type="hidden" id="modalCategoryIdDetail">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 <button type="button" id="addToCartButtonDetail" class="btn btn-primary">Tambah ke Keranjang</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal untuk Rekomendasi Produk -->
-<div class="modal fade" id="productRecommendationModal" tabindex="-1" aria-labelledby="productRecommendationModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="productRecommendationModalLabel">Detail Produk</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <img src="" class="img-fluid" alt="">
-                <h4></h4>
-                <p></p>
-                <h5></h5>
-                <input type="hidden" id="modalProductIdRecommendation">
-                <input type="hidden" id="modalCategoryIdRecommendation">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                <button type="button" id="addToCartButtonRecommendation" class="btn btn-primary">Tambah ke Keranjang</button>
             </div>
         </div>
     </div>
@@ -295,12 +283,9 @@
         modal.find('.modal-body h5').text('');
     }
 
-    // When product detail modal or recommendation modal is shown
     $('#productDetailModal, #productRecommendationModal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget);
         var modal = $(this);
-
-        // Get data attributes from the clicked button
         var productId = button.data('id');
         var categoryId = button.data('category');
         var productName = button.data('name');
@@ -309,8 +294,6 @@
         var productImage = button.data('image');
 
         resetModal(modal);
-
-        // Set modal content
         modal.find('#modalProductIdDetail, #modalProductIdRecommendation').val(productId);
         modal.find('#modalCategoryIdDetail, #modalCategoryIdRecommendation').val(categoryId);
         modal.find('.modal-body img').attr('src', productImage);
@@ -318,8 +301,6 @@
         modal.find('.modal-body p').text(productDescription);
         modal.find('.modal-body h5').text('Rp ' + productPrice);
     });
-
-    // Add to cart button click handler
     $('#addToCartButtonDetail, #addToCartButtonRecommendation').click(function () {
         var buttonId = $(this).attr('id');
         var productId = buttonId === 'addToCartButtonDetail'
@@ -328,9 +309,7 @@
         var categoryId = buttonId === 'addToCartButtonDetail'
             ? $('#modalCategoryIdDetail').val()
             : $('#modalCategoryIdRecommendation').val();
-        var customerId = {{ Auth::guard('customer')->user()->id }}; // Customer ID
-
-        // Ajax request to add product to cart
+        var customerId = {{ Auth::guard('customer')->user()->id }};
         $.ajax({
             url: '/customer/dashboard/add-to-cart',
             method: 'POST',
@@ -340,8 +319,8 @@
                 produk_id: productId
             },
             success: function (response) {
-                alert(response.success || 'Produk berhasil ditambahkan ke keranjang!');
-                $('.modal').modal('hide'); // Close modal on success
+    alert(response.success || 'Produk berhasil ditambahkan ke keranjang!');
+    $('.modal').modal('hide');
             },
             error: function (xhr) {
                 var errorMsg = xhr.responseJSON?.error || 'Terjadi kesalahan saat menambahkan produk ke keranjang.';
